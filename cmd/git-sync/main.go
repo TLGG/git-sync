@@ -134,7 +134,7 @@ func treeIsDirty(gitRoot string) bool {
         return false
     }
 
-    log.V(0).Infof("git status output:\n %s", out)
+    log.V(0).Infof("git status output: %s", out)
 
     return len(out) != 0
 }
@@ -168,9 +168,9 @@ func commitAndPush(gitRoot string, msg string) {
         return
     }
 
-    out, err = runCommand(gitRoot, "git","push","origin", "master")
+    out, err = runCommand(gitRoot, "git","push","origin", "HEAD:master")
     if err != nil{
-        log.Errorf("error committing: %s\n", err)
+        log.Errorf("error pushing: %s\n", err)
         return
     }
 
@@ -422,8 +422,8 @@ func syncRepo(repo, branch, rev string, depth int, gitRoot, dest string) error {
         return fmt.Errorf("error checking if repo exists %q: %v", gitRepoPath, err)
     case treeIsDirty(gitRoot):
         log.V(0).Infof("gotta commit an push")
-        commitAndPush(gitRoot, time.Now().Format(time.UnixDate))
-        return nil
+        commitAndPush(target, time.Now().Format(time.UnixDate))
+        fallthrough
     default:
         local, remote, err := getRevs(target, branch, rev)
         if err != nil {
